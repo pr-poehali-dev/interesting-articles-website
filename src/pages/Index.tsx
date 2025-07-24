@@ -8,6 +8,7 @@ import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('Все');
   const [comments, setComments] = useState([
     { id: 1, author: 'Анна Петрова', text: 'Отличная статья! Очень полезная информация.', time: '2 часа назад' },
     { id: 2, author: 'Михаил К.', text: 'Согласен с автором. Добавлю в закладки.', time: '4 часа назад' }
@@ -38,10 +39,39 @@ const Index = () => {
       category: 'UX/UI',
       readTime: '6 мин',
       image: '/img/3e2143be-f9db-4a8a-a159-7b079164e2e9.jpg'
+    },
+    {
+      id: 4,
+      title: 'Основы SEO продвижения',
+      excerpt: 'Практические советы по поисковой оптимизации для начинающих веб-мастеров.',
+      category: 'Маркетинг',
+      readTime: '7 мин',
+      image: '/img/3e2143be-f9db-4a8a-a159-7b079164e2e9.jpg'
+    },
+    {
+      id: 5,
+      title: 'Адаптивная верстка: лучшие практики',
+      excerpt: 'Современные подходы к созданию отзывчивых веб-интерфейсов.',
+      category: 'Разработка',
+      readTime: '6 мин',
+      image: '/img/3e2143be-f9db-4a8a-a159-7b079164e2e9.jpg'
+    },
+    {
+      id: 6,
+      title: 'Цветовая психология в дизайне',
+      excerpt: 'Как правильно использовать цвета для создания эмоциональной связи с пользователем.',
+      category: 'Дизайн',
+      readTime: '4 мин',
+      image: '/img/3e2143be-f9db-4a8a-a159-7b079164e2e9.jpg'
     }
   ];
 
   const categories = ['Все', 'Дизайн', 'Разработка', 'UX/UI', 'Маркетинг'];
+
+  // Фильтрация статей по активной категории
+  const filteredArticles = activeCategory === 'Все' 
+    ? articles 
+    : articles.filter(article => article.category === activeCategory);
 
   const addComment = () => {
     if (newComment.trim()) {
@@ -119,11 +149,12 @@ const Index = () => {
             {categories.map((category, index) => (
               <Badge
                 key={index}
-                variant={index === 0 ? "default" : "outline"}
+                variant={activeCategory === category ? "default" : "outline"}
+                onClick={() => setActiveCategory(category)}
                 className={`px-6 py-2 text-sm font-medium cursor-pointer transition-all hover-scale ${
-                  index === 0 
+                  activeCategory === category 
                     ? 'bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white' 
-                    : 'hover:bg-[#4ECDC4] hover:text-white'
+                    : 'hover:bg-[#4ECDC4] hover:text-white border-gray-300'
                 }`}
               >
                 {category}
@@ -136,10 +167,18 @@ const Index = () => {
       {/* Articles */}
       <section id="articles" className="py-16">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">Последние статьи</h3>
+          <div className="flex items-center justify-between mb-12">
+            <h3 className="text-3xl font-bold">
+              {activeCategory === 'Все' ? 'Последние статьи' : `Статьи: ${activeCategory}`}
+            </h3>
+            <div className="text-sm text-gray-500">
+              Найдено: {filteredArticles.length} статей
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article, index) => (
-              <Card key={article.id} className="overflow-hidden hover-scale transition-all duration-300 border-0 shadow-lg hover:shadow-xl animate-fade-in">
+            {filteredArticles.length > 0 ? (
+              filteredArticles.map((article, index) => (
+                <Card key={article.id} className="overflow-hidden hover-scale transition-all duration-300 border-0 shadow-lg hover:shadow-xl animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
                 <div className="relative h-48 overflow-hidden">
                   <img 
                     src={article.image} 
@@ -168,7 +207,16 @@ const Index = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Icon name="FileText" size={24} className="text-gray-400" />
+                </div>
+                <h4 className="text-lg font-semibold text-gray-600 mb-2">Статьи не найдены</h4>
+                <p className="text-gray-500">В категории "{activeCategory}" пока нет статей</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
